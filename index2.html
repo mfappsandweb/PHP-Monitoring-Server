@@ -526,8 +526,8 @@
             <span class="info-box-icon bg-aqua"><i class="ion ion-ios-gear-outline"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">CPU Traffic</span>
-              <span class="info-box-number">90<small>%</small></span>
+              <span class="info-box-text">Device Count</span>
+              <span class="info-box-number" id="dashboard-device-count"></span>
             </div>
             <!-- /.info-box-content -->
           </div>
@@ -536,11 +536,11 @@
         <!-- /.col -->
         <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
+            <span class="info-box-icon bg-red"><i class="ion ion-ios-pulse-strong"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Likes</span>
-              <span class="info-box-number">41,410</span>
+              <span class="info-box-text">Average CPU</span>
+              <span class="info-box-number" id="dashboard-cpu-average"></span>
             </div>
             <!-- /.info-box-content -->
           </div>
@@ -553,11 +553,11 @@
 
         <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
-            <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+            <span class="info-box-icon bg-green"><i class="ion ion-stats-bars"></i></span>
 
             <div class="info-box-content">
-              <span class="info-box-text">Sales</span>
-              <span class="info-box-number">760</span>
+              <span class="info-box-text">Average Memory</span>
+              <span class="info-box-number" id="dashboard-memory-average"></span>
             </div>
             <!-- /.info-box-content -->
           </div>
@@ -1567,5 +1567,15 @@
 <script src="dist/js/pages/dashboard2.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+<!-- Monitoring Script JS -->
+<script src="dist/js/monitoring-get-system-info.js"></script>
+<script>
+    $(document).ready(function() {
+        getSystemInfo();
+        getUniqueDevices();
+        systemsAverageCPUPercent();
+        systemsAverageMemoryPercent();
+    })
+</script>
 </body>
 </html>
