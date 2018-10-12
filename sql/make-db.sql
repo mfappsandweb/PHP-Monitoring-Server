@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS device_log (
     hostname VARCHAR(64),
     system_name VARCHAR(64),
     system_version VARCHAR(64),
+    uptime BIGINT,
     cpu_count TINYINT,
     cpu_usage NUMERIC(4, 1),
     memory_total BIGINT,
