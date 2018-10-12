@@ -6,24 +6,25 @@
 
 var systemJSON;
 var dataJSON;
+var deviceUnique;
 
 // First run
-getDevices();
 getUniqueDevices();
+getDevices();
 
 // Set 60 second interval
 var getDevicesInterval = setInterval(
     function() { 
         getDevices() 
     }, 
-    60 * 1000
+    5 * 1000
 );
 
 var deviceCountInterval = setInterval(
     function() { 
         getUniqueDevices() 
     }, 
-    60 * 1000
+    5 * 1000
 );
 
 function getDevices() {
@@ -43,7 +44,7 @@ function getDevices() {
             $(document).ready(function() {
                 systemsAverageCPUPercent();
                 systemsAverageMemoryPercent();
-                systemsAverageUptime();
+                systemsAverageTraffic();
             });
         }
     );
@@ -56,6 +57,7 @@ function getUniqueDevices() {
             condition: "unique devices"
         },
         function(response) {
+            deviceUnique = parseInt(response);
             $(document).ready(function() {
                 $("#dashboard-device-count").empty();
                 $("#dashboard-device-count").append(response);
@@ -72,7 +74,7 @@ function systemsAverageCPUPercent() {
 function calcAvgCPU(dataJSON) {
     var cpuCount = 0.0;
     var cpuAvg;
-    for(var i = 0; i < dataJSON.length; i++) {
+    for(var i = 0; i < deviceUnique; i++) {
         cpuCount += parseFloat(dataJSON[i].cpu_usage);
     }
     cpuAvg = cpuCount / i;
@@ -87,36 +89,42 @@ function systemsAverageMemoryPercent() {
 function calcAvgMemory(dataJSON) {
     var memCount = 0.0;
     var memAvg;
-    for(var i = 0; i < dataJSON.length; i++) {
+    for(var i = 0; i < deviceUnique; i++) {
         memCount += parseFloat(dataJSON[i].memory_used_percent);
     }
     memAvg = memCount / i;
     return memAvg.toFixed(2);
 };
 
-function systemsAverageUptime() {
-    var uptimeAvg = calcAvgUptime(dataJSON);
-    $("#dashboard-uptime-average").empty();
-    $("#dashboard-uptime-average").append(uptimeAvg);
+function systemsAverageTraffic() {
+    var trafficAvg = calcAvgTraffic(dataJSON);
+    $("#dashboard-traffic-average").empty();
+    $("#dashboard-traffic-average").append(trafficAvg);
 };
-function calcAvgUptime(dataJSON) {
-    var uptimeCount = 0;
-    var uptimeAvg;
-    for(var i = 0; i < dataJSON.length; i++) {
-        uptimeCount += parseInt(dataJSON[i].uptime);
+function calcAvgTraffic(dataJSON) {
+    var trafficCount = 0;
+    var trafficAvg = 0;
+    for(var i = 0; i < deviceUnique; i++) {
+        trafficCount += parseInt(dataJSON[i].network_up);
+        trafficCount += parseInt(dataJSON[i].network_down);
     }
-    uptimeAvg = uptimeCount / i;
+    trafficAvg = Math.floor(trafficCount / i);
     
-    var hours = Math.floor(uptimeAvg / 3600);
-    var minutes = Math.floor((uptimeAvg % 3600) / 60);
+    var trafficKB = Math.round(trafficAvg / 1024);
+    var trafficMB = Math.round(trafficAvg / 1048576);
 
-    if(hours > 0) {
-        return hours + " hours " + minutes + " mins";
+    if(trafficMB > 10) {
+        return formatThousandSeperator(trafficMB) + " MB/s";
     }
-    else if(minutes > 0) {
-        return minutes + " mins";
+    else if(trafficKB > 10) {
+        return formatThousandSeperator(trafficKB) + " kB/s";
     }
     else {
-        return uptimeAvg + " seconds";
+        return formatThousandSeperator(trafficAvg) + " B/s"
     }
 };
+
+// Format large numbers with commas
+function formatThousandSeperator(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
