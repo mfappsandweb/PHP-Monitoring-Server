@@ -9,7 +9,7 @@
     $machine_drives = $machine->drives;
     $machine_os = $machine->system;
 
-    // Add slashes to string properties
+    // Add escape character to string properties
     $machine->hostname = addslashes($machine->hostname);
     $machine_os->name = addslashes($machine_os->name);
     $machine_os->version = addslashes($machine_os->version);
@@ -17,12 +17,46 @@
     // Connect to server database
     $db = new MySQL_Server_Connection();
 
+    // Save OS
+    $machine_os_sql = 
+        "SELECT *
+            FROM operating_systems
+            WHERE name = \"$machine_os->name\"
+            AND version = \"$machine_os->version\";";
+    
+    $res = $db->runSQLQuery($machine_os_sql);
+
+    if( isset($res['rows']) && $res['rows'][0]['id'] != "") {
+        $os_id = $res['rows'][0]['id'];
+    }
+    else {
+        $machine_os_sql = 
+            "INSERT INTO operating_systems(
+                name,
+                version
+            )
+            VALUES(
+                \"$machine_os->name\",
+                \"$machine_os->version\"
+            );";
+    
+        $db->runSQLQuery($machine_os_sql);
+        
+        $machine_os_sql = 
+        "SELECT *
+            FROM operating_systems
+            WHERE name = \"$machine_os->name\"
+            AND version = \"$machine_os->version\";";
+        
+        $res = $db->runSQLQuery($machine_os_sql);
+        $os_id = $res['rows'][0]['id'];
+    }
+
     // Build device log SQL query
     $device_log_sql = 
         "INSERT INTO device_log(
             hostname,
-            system_name,
-            system_version,
+            os_id,
             uptime,
             cpu_count,
             cpu_usage,
@@ -35,8 +69,7 @@
         )
         VALUES(
             \"$machine->hostname\",
-            \"$machine_os->name\",
-            \"$machine_os->version\",
+            $os_id,
             $machine->uptime,
             $machine->cpu_count,
             $machine->cpu_usage,
@@ -74,6 +107,7 @@
 
     $host_id = $res["rows"][0]["id"];
 
+
     foreach($machine_drives as $drive) {
         $drive->name = addslashes($drive->name);
         $drive->mount_point = addslashes($drive->mount_point);
@@ -86,7 +120,7 @@
                 type,
                 total_size,
                 used_size,
-                used_percent,
+                percent_used,
                 timestamp,
                 host_id
             )
