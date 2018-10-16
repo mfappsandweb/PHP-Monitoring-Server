@@ -17,5 +17,5 @@
 
 ### Planned Implementation
 
-- [ ] api/index.php process POST data pushes
+- [x] api/index.php process POST data pushes
 - [ ] index.html query device data from MySQL with jQuery to api/get.php

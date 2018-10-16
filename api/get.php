@@ -9,6 +9,7 @@
 
     switch($_GET['condition']) {
         case "unique devices":
+            // Count unique device names
             $device_sql =
             "SELECT COUNT(DISTINCT hostname)
                 FROM device_log
@@ -35,6 +36,7 @@
 
             $devices = $response['rows'];
 
+            // Get system drives
             for($i = 0; $i < count($devices); $i++) {
                 $drive_sql = 
                 "SELECT *
