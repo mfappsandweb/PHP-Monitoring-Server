@@ -33,19 +33,29 @@ function getDevices() {
 
         function(response) {
 
-            systemJSON = JSON.parse(response);
-            dataJSON = systemJSON.rows;
+            try {
+                systemJSON = JSON.parse(response);
+                dataJSON = systemJSON.rows;
 
-            // Check device info
-            //for(var i=0; i<dataJSON.length; i++) {
-            //    console.log(dataJSON[i]);
-            //}
+                // Check device info
+                //for(var i=0; i<dataJSON.length; i++) {
+                //    console.log(dataJSON[i]);
+                //}
 
-            $(document).ready(function() {
-                systemsAverageCPUPercent();
-                systemsAverageMemoryPercent();
-                systemsAverageTraffic();
-            });
+                $(document).ready(function() {
+                    systemsAverageCPUPercent();
+                    systemsAverageMemoryPercent();
+                    systemsAverageTraffic();
+                });
+            }
+            catch(e) {
+                $("#dashboard-cpu-average").empty();
+                $("#dashboard-cpu-average").append("0 <small>%</small>");
+                $("#dashboard-memory-average").empty();
+                $("#dashboard-memory-average").append("0 <small>%</small>");
+                $("#dashboard-traffic-average").empty();
+                $("#dashboard-traffic-average").append("0 B/s");
+            }
         }
     );
 };
@@ -67,11 +77,11 @@ function getUniqueDevices() {
 };
 
 function systemsAverageCPUPercent() {
-    var cpuAvg = calcAvgCPU(dataJSON);
+    var cpuAvg = calcAvgCPU();
     $('#dashboard-cpu-average').empty();
     $('#dashboard-cpu-average').append(cpuAvg + "<small>%</small>");
 };
-function calcAvgCPU(dataJSON) {
+function calcAvgCPU() {
     var cpuCount = 0.0;
     var cpuAvg;
     for(var i = 0; i < deviceUnique; i++) {
@@ -82,11 +92,11 @@ function calcAvgCPU(dataJSON) {
 };
 
 function systemsAverageMemoryPercent() {
-    var memAvg = calcAvgMemory(dataJSON);
+    var memAvg = calcAvgMemory();
     $('#dashboard-memory-average').empty();
     $('#dashboard-memory-average').append(memAvg + "<small>%</small>");
 };
-function calcAvgMemory(dataJSON) {
+function calcAvgMemory() {
     var memCount = 0.0;
     var memAvg;
     for(var i = 0; i < deviceUnique; i++) {
@@ -97,11 +107,11 @@ function calcAvgMemory(dataJSON) {
 };
 
 function systemsAverageTraffic() {
-    var trafficAvg = calcAvgTraffic(dataJSON);
+    var trafficAvg = calcAvgTraffic();
     $("#dashboard-traffic-average").empty();
     $("#dashboard-traffic-average").append(trafficAvg);
 };
-function calcAvgTraffic(dataJSON) {
+function calcAvgTraffic() {
     var trafficCount = 0;
     var trafficAvg = 0;
     for(var i = 0; i < deviceUnique; i++) {
